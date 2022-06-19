@@ -8,7 +8,12 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [tours, setTours] = useState([]);
 
-  useEffect(() => {
+  const removeTour = (id) => {
+    const newTours = tours.filter((tour) => tour.id !== id);
+    setTours(newTours);
+  };
+
+  const loadAPI = () => {
     setLoading(true);
     axios
       .get(url)
@@ -20,6 +25,10 @@ function App() {
         setLoading(false);
         console.log(e.message);
       });
+  };
+
+  useEffect(() => {
+    loadAPI();
   }, []);
 
   if (loading) {
@@ -28,13 +37,26 @@ function App() {
         <Loading />
       </main>
     );
-  } else {
+  }
+
+  if (tours.length === 0) {
     return (
       <main>
-        <Tours tours={tours} />
+        <div className="title">
+          <h2>no tours left</h2>
+          <button className="btn" onClick={() => loadAPI()}>
+            refresh
+          </button>
+        </div>
       </main>
     );
   }
+
+  return (
+    <main>
+      <Tours tours={tours} removeTour={removeTour} />
+    </main>
+  );
 }
 
 export default App;
